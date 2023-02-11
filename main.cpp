@@ -1,9 +1,7 @@
-#include <iostream>
 #include "tracker.hpp"
+#include <iostream>
 
-int main()
-{
-  printXui();
+int main() {
   std::cout << "Hello main\n";
 
   return 0;
