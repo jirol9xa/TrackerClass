@@ -1,8 +1,5 @@
+#include "storyTree.hpp"
 #include "tracker.hpp"
 #include <iostream>
 
-int main() {
-  std::cout << "Hello main\n";
-
-  return 0;
-}
+int main() { return 0; }
