@@ -16,15 +16,22 @@ private:
   } _info;
 
   int _val; // Value of myOwn int
+
+  static uint_fast32_t _obj_amnt; // For indexing all Trackers for storyTree
+  static uint_fast32_t _same_time_alive; // For counting max amnt simultaneously 
+                                         // alive objects
+
 public:
   Tracker(const VarInfo &birth_info, const int &val = std::rand() % INT32_MAX)
-      : _info(birth_info), _val(val) {}
+      : _info(birth_info), _val(val) {
+    ++_obj_amnt;
+    ++_same_time_alive;
+  }
 
   // Return a Tracker&, because we should do smt like that a.setLastUseLoc(...)
   // = 10
   Tracker &setLastUseLoc(const LocationInfo &loc) {
     _info.loc = loc;
-
     return *this;
   }
 
@@ -37,4 +44,8 @@ public:
 
   Tracker operator+(const Tracker &that) {}
   Tracker operator-(const Tracker &that) {}
+  Tracker operator*(const Tracker &that) {}
+  Tracker operator/(const Tracker &that) {}
+
+  ~Tracker() {--_same_time_alive;}
 };
