@@ -1,8 +1,8 @@
 #pragma once
 
+#include <cstdint>
 #include <unordered_map>
 #include <vector>
-#include <cstdint>
 
 /// Enumeration for events, which my occur
 enum EVENT_TYPE {
@@ -30,12 +30,20 @@ class Tracker;
 
 /// Implementation for simple node in StoryTree
 struct Node_t {
-  Tracker *_tracked_var;
-  EVENT_TYPE _type;
+  // we need explicit say, that node have a twin with passing false
+  Node_t(const Tracker *tracked_var, const EVENT_TYPE event,
+         bool is_unique = true)
+      : _tracked_var(tracked_var), _event(event) {
+    _obj_amnt += is_unique;
+    _idx = _obj_amnt;
+  }
 
-  // Mb not enough
-  Node_t *_prev;
-  Node_t *_next;
+  const Tracker *_tracked_var;
+  const EVENT_TYPE _event;
+  uint_fast32_t _idx;
+
+private:
+  static uint_fast32_t _obj_amnt;
 };
 
 /// Implementation of story tree for the project
@@ -50,12 +58,11 @@ private:
 public:
   static StoryTree &getInstance() {
     static StoryTree Tree;
-
     return Tree;
   }
 
   StoryTree(const StoryTree &) = delete;
   void operator=(const StoryTree &) = delete;
 
-  //void addNode(Node)
+  void addNode(const Node_t &node);
 };

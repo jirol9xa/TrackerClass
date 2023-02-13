@@ -11,16 +11,15 @@ private:
   int_fast32_t _ops_rmnd = 5;
   struct VarInfo // Class for containing birth info
   {
-    uint_fast64_t addr;
+    uint_fast32_t idx;
     LocationInfo loc;
   } _info;
 
   int _val; // Value of myOwn int
 
   static uint_fast32_t _obj_amnt; // For indexing all Trackers for storyTree
-  static uint_fast32_t _same_time_alive; // For counting max amnt simultaneously 
+  static uint_fast32_t _same_time_alive; // For counting max amnt simultaneously
                                          // alive objects
-
 public:
   Tracker(const VarInfo &birth_info, const int &val = std::rand() % INT32_MAX)
       : _info(birth_info), _val(val) {
@@ -47,5 +46,5 @@ public:
   Tracker operator*(const Tracker &that) {}
   Tracker operator/(const Tracker &that) {}
 
-  ~Tracker() {--_same_time_alive;}
+  ~Tracker() { --_same_time_alive; }
 };
