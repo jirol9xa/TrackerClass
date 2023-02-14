@@ -4,47 +4,47 @@
 #include <cstdint>
 #include <cstdlib>
 
+struct Node_t;
+
 // Implementation for Tracker class
 // TODO: Make it template
 class Tracker {
+  friend struct Node_t;
+
 private:
-  int_fast32_t _ops_rmnd = 5;
-  struct VarInfo // Class for containing birth info
-  {
-    uint_fast32_t idx;
-    LocationInfo loc;
-  } _info;
+  int_fast32_t ops_rmnd_ = 5;
+  LocationInfo loc_; // For containing birth info
 
-  int _val; // Value of myOwn int
+  int val_; // Value of myOwn int
 
-  static uint_fast32_t _obj_amnt; // For indexing all Trackers for storyTree
-  static uint_fast32_t _same_time_alive; // For counting max amnt simultaneously
+  static uint_fast32_t obj_amnt_; // For indexing all Trackers for storyTree
+  static uint_fast32_t same_time_alive_; // For counting max amnt simultaneously
                                          // alive objects
 public:
-  Tracker(const VarInfo &birth_info, const int &val = std::rand() % INT32_MAX)
-      : _info(birth_info), _val(val) {
-    ++_obj_amnt;
-    ++_same_time_alive;
+  Tracker() {}
+  Tracker(const LocationInfo &birth_info,
+          const int &val = std::rand() % INT32_MAX)
+      : loc_(birth_info), val_(val) {
+    ++obj_amnt_;
+    ++same_time_alive_;
   }
 
   // Return a Tracker&, because we should do smt like that a.setLastUseLoc(...)
   // = 10
   Tracker &setLastUseLoc(const LocationInfo &loc) {
-    _info.loc = loc;
+    loc_ = loc;
     return *this;
   }
+  const Tracker &operator+=(const Tracker &that);
+  const Tracker &operator-=(const Tracker &that);
+  const Tracker &operator*=(const Tracker &that);
+  const Tracker &operator/=(const Tracker &that);
+  operator int(); // Operator for implicit casting Tracker val to int
 
-  const Tracker &operator+=(const Tracker &that) {}
-  const Tracker &operator-=(const Tracker &that) {}
-  const Tracker &operator*=(const Tracker &that) {}
-  const Tracker &operator/=(const Tracker &that) {}
-  operator int() // Operator for implicit casting Tracker val to int
-  {}
+  Tracker operator+(const Tracker &that);
+  Tracker operator-(const Tracker &that);
+  Tracker operator*(const Tracker &that);
+  Tracker operator/(const Tracker &that);
 
-  Tracker operator+(const Tracker &that) {}
-  Tracker operator-(const Tracker &that) {}
-  Tracker operator*(const Tracker &that) {}
-  Tracker operator/(const Tracker &that) {}
-
-  ~Tracker() { --_same_time_alive; }
+  ~Tracker() { --same_time_alive_; }
 };

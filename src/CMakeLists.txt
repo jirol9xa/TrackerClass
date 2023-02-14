@@ -5,5 +5,4 @@ project(src)
 set(TRACKER tracker.cpp)
 set(STORY_TREE storyTree.cpp)
 
-add_library(src STATIC ${TRACKER})
-add_library(src STATIC ${STORY_TREE})
+add_library(src STATIC tracker.cpp storyTree.cpp)
