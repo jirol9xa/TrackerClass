@@ -7,4 +7,6 @@ uint_fast32_t Tracker::same_time_alive_ = 0;
 
 StoryTree &kTree = StoryTree::getInstance();
 
-int main() { return 0; }
+int main() {
+    return 0;
+}
