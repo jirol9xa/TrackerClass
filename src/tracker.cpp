@@ -86,3 +86,8 @@ Tracker::operator int() {
 
     return val_;
 }
+
+std::string Tracker::dump() const {
+    return "ops_rmnd_ = " + std::to_string(ops_rmnd_) + " val_ = " + std::to_string(val_) + '\n' +
+           '|' + loc_.dump();
+}

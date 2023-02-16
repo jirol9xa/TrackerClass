@@ -8,26 +8,13 @@
 
 /// Enumeration for events, which my occur
 enum EVENT_TYPE {
-    CNSTR,
-    DSTR,
-    COPY_CNST,
-    RVAL_COPY_CNSTR,
-    OP_ASGN,
-    RVAL_OP_ASGN,
+#define DEF_EVENT(param) param,
+#include "events.inc"
+#undef DEF_EVENT
 
-    OP_ADD,
-    OP_SUB,
-    OP_MUL,
-    OP_DIV,
-
-    OP_SUB_ASGN,
-    OP_ADD_ASGN,
-    OP_MUL_ASGN,
-    OP_DIV_ASGN,
-
-    PASSED_AS_ARG,
-    INTPR_AS_INT,
 };
+
+std::string printEventName(enum EVENT_TYPE event);
 
 /// Implementation for simple node in StoryTree
 struct Node_t {
@@ -58,7 +45,7 @@ struct Node_t {
 /// tear it apart
 class StoryTree {
   private:
-    std::unordered_map<uint_fast32_t, std::vector<Node_t>> _forest;
+    std::unordered_map<uint_fast32_t, std::vector<Node_t>> forest_;
 
     StoryTree(){};
 
@@ -72,6 +59,9 @@ class StoryTree {
     void operator=(const StoryTree &) = delete;
 
     void addNode(const Node_t &node);
+
+    const std::vector<Node_t> &getVarHistory(uint_fast32_t idx) { return forest_[idx]; }
+    uint_fast32_t getVarAmnt() const { return forest_.size(); }
 };
 
 // Name of global var, that should be use as a story tree

@@ -3,6 +3,7 @@
 #include "locInfo.hpp"
 #include <cstdint>
 #include <cstdlib>
+#include <string>
 
 struct Node_t;
 
@@ -44,6 +45,8 @@ class Tracker {
     Tracker operator-(const Tracker &that);
     Tracker operator*(const Tracker &that);
     Tracker operator/(const Tracker &that);
+
+    std::string dump() const;
 
     ~Tracker() { --same_time_alive_; }
 };
