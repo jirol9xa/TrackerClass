@@ -19,7 +19,7 @@ int main() {
     CREATE_AND_INIT(B, 4);
 
     CREATE_AND_INIT(C, USE(A) + USE(B));
-    USE(A) - USE(B);
+    USE(A) * USE(B);
 
     render_viz.drawTree();
 
