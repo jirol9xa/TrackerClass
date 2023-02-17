@@ -18,6 +18,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -mavx2")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address,leak,undefined -Wall -Wextra -Wpedantic -g -O0")
 
 set(MAIN_FILE main.cpp)
+set(SOURCE main.cpp)
 
 include_directories(include)  # Src headers
 
@@ -26,3 +27,19 @@ add_executable(main ${MAIN_FILE})
 add_subdirectory(src)
 
 target_link_libraries(main src)
+
+find_program(CLANG_FORMAT "clang-format")
+if(CLANG_FORMAT)
+    file(GLOB_RECURSE ALL_CXX_SOURCE_FILES
+        ${PROJECT_SOURCE_DIR}/*.[ch]pp
+        ${PROJECT_SOURCE_DIR}/*.[ch]
+    )
+
+    add_custom_target(
+        clang-force-format
+        COMMAND clang-format
+        -i
+        -style=file
+        ${ALL_CXX_SOURCE_FILES}
+    )
+endif()

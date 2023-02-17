@@ -23,11 +23,7 @@ class Tracker {
                                            // alive objects
   public:
     Tracker() {}
-    Tracker(const LocationInfo &birth_info, const int &val = std::rand() % INT32_MAX)
-        : loc_(birth_info), val_(val) {
-        ++obj_amnt_;
-        ++same_time_alive_;
-    }
+    Tracker(const LocationInfo &birth_info, const int &val = std::rand() % INT32_MAX);
 
     // Return a Tracker&, because we should do smt like that a.setLastUseLoc(...)
     // = 10
