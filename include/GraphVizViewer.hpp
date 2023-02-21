@@ -1,6 +1,6 @@
 #pragma once
 
-#include "treeViewer.hpp"
+#include "TreeViewer.hpp"
 #include <fstream>
 
 /// Class for implementing rendering of storyTree with graphViz

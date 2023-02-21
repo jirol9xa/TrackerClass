@@ -1,12 +1,50 @@
-#include "tracker.hpp"
-#include "macro.hpp"
-#include "storyTree.hpp"
+#include "Tracker.hpp"
+#include "Macro.hpp"
+#include "StoryTree.hpp"
 
 Tracker::Tracker(const LocationInfo &birth_info, const int &val) : loc_(birth_info), val_(val) {
-            ++obj_amnt_;
+    idx_ = ++obj_amnt_;
     ++same_time_alive_;
 
     kTree.addNode({this, CTOR, true});
+}
+
+Tracker::Tracker(const Tracker &that) {
+    ops_rmnd_ = that.ops_rmnd_;
+    loc_ = that.loc_;
+    val_ = that.val_;
+
+    idx_ = ++obj_amnt_;
+    same_time_alive_++;
+
+    kTree.addNode({&that, COPY_CNST});
+    kTree.addNode({this, COPY_CNST, true});
+}
+
+Tracker::Tracker(Tracker &&that) {
+    ops_rmnd_ = that.ops_rmnd_;
+    loc_ = that.loc_;
+    val_ = that.val_;
+
+    idx_ = ++obj_amnt_;
+    same_time_alive_++;
+
+    kTree.addNode({&that, RVAL_COPY_CNSTR, true});
+    kTree.addNode({this, RVAL_COPY_CNSTR});
+}
+
+const Tracker &Tracker::operator=(Tracker &&that) {
+    ops_rmnd_ = that.ops_rmnd_;
+    loc_ = that.loc_;
+    val_ = that.val_;
+
+    idx_ = ++obj_amnt_;
+    same_time_alive_++;
+
+    kTree.addNode({&that, RVAL_OP_ASGN, true});
+    kTree.addNode({this, RVAL_OP_ASGN});
+
+    return *this;
 }
 
 const Tracker &Tracker::operator+=(const Tracker &that) {

@@ -4,12 +4,12 @@
 #include <unordered_map>
 #include <vector>
 
-#include "tracker.hpp"
+#include "Tracker.hpp"
 
 /// Enumeration for events, which my occur
 enum EVENT_TYPE {
 #define DEF_EVENT(param) param,
-#include "events.inc"
+#include "Events.inc"
 #undef DEF_EVENT
 
 };
@@ -29,7 +29,10 @@ struct Node_t {
         copy_var_.val_ = tracked_var->val_;
         copy_var_.loc_ = tracked_var->loc_;
         copy_var_.ops_rmnd_ = tracked_var->ops_rmnd_;
+        copy_var_.idx_ = tracked_var->idx_;
     }
+
+    Node_t(const Node_t &that);
 
     const Tracker *tracked_var_;
     Tracker copy_var_;
@@ -45,7 +48,7 @@ struct Node_t {
 /// tear it apart
 class StoryTree {
   private:
-    std::unordered_map<uint_fast32_t, std::vector<Node_t>> forest_;
+    mutable std::unordered_map<uint_fast32_t, std::vector<Node_t>> forest_;
 
     StoryTree(){};
 
@@ -60,7 +63,7 @@ class StoryTree {
 
     void addNode(const Node_t &node);
 
-    const std::vector<Node_t> &getVarHistory(uint_fast32_t idx) { return forest_[idx]; }
+    auto getVarHistory(uint_fast32_t idx) const { return forest_[idx]; }
     uint_fast32_t getVarAmnt() const { return forest_.size(); }
 };
 

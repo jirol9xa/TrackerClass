@@ -1,6 +1,6 @@
 #pragma once
 
-#include "locInfo.hpp"
+#include "LocInfo.hpp"
 #include <cstdint>
 #include <cstdlib>
 #include <string>
@@ -15,6 +15,7 @@ class Tracker {
   private:
     int_fast32_t ops_rmnd_ = 5;
     LocationInfo loc_; // For containing birth info
+    uint_fast32_t idx_;
 
     int val_; // Value of myOwn int
 
@@ -24,6 +25,10 @@ class Tracker {
   public:
     Tracker() {}
     Tracker(const LocationInfo &birth_info, const int &val = std::rand() % INT32_MAX);
+
+    Tracker(const Tracker &that);
+    Tracker(Tracker &&that);
+    const Tracker &operator=(Tracker &&that);
 
     // Return a Tracker&, because we should do smt like that a.setLastUseLoc(...)
     // = 10
@@ -35,6 +40,7 @@ class Tracker {
     const Tracker &operator-=(const Tracker &that);
     const Tracker &operator*=(const Tracker &that);
     const Tracker &operator/=(const Tracker &that);
+    const Tracker &operator=(const Tracker &that);
     operator int(); // Operator for implicit casting Tracker val to int
 
     Tracker operator+(const Tracker &that);
@@ -43,6 +49,6 @@ class Tracker {
     Tracker operator/(const Tracker &that);
 
     std::string dump() const;
-
+    uint_fast32_t getIdx() const { return idx_; }
     ~Tracker() { --same_time_alive_; }
 };

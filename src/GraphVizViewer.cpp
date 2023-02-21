@@ -1,4 +1,4 @@
-#include "graphVizViewer.hpp"
+#include "GraphVizViewer.hpp"
 
 void GraphVizViewer::drawTree() const {
     makePrologue();
@@ -39,7 +39,7 @@ void GraphVizViewer::showPic() const {
 }
 
 void GraphVizViewer::drawVarHistory_intrnl(uint_fast32_t var_idx) const {
-    auto &history = const_cast<StoryTree &>(tree_).getVarHistory(var_idx);
+    const auto &history = tree_.getVarHistory(var_idx);
 
     for (uint_fast32_t i = 0; i < history.size(); ++i) {
         const Node_t &node = history[i];

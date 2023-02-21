@@ -1,6 +1,6 @@
 #pragma once
 
-#include "storyTree.hpp"
+#include "StoryTree.hpp"
 
 // Class, that implement interface for rendering storyTree
 class TreeViewer {
