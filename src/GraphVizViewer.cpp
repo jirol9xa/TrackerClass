@@ -15,6 +15,7 @@ void GraphVizViewer::drawTree() const {
 void GraphVizViewer::drawVarHistory(uint_fast32_t var_idx) const {
     makePrologue();
 
+    tree_.sortNodes();
     drawVarHistory_intrnl(var_idx);
 
     makeEpilogue();
@@ -42,7 +43,7 @@ void GraphVizViewer::drawVarHistory_intrnl(uint_fast32_t var_idx) const {
     const auto &history = tree_.getVarHistory(var_idx);
 
     for (uint_fast32_t i = 0; i < history.size(); ++i) {
-        const Node_t &node = history[i];
+        const auto &node = tree_.getNode(history.at(i));
 
         file_ << "    var" << node.idx_ << "[shape = record, label = \""
               << "event: " << printEventName(node.event_) << '|' << node.copy_var_.dump();
@@ -51,8 +52,8 @@ void GraphVizViewer::drawVarHistory_intrnl(uint_fast32_t var_idx) const {
         if (i == 0)
             continue;
 
-        auto event = history[i].event_;
-        file_ << "    var" << history[i - 1].idx_ << " -> "
+        auto event = node.event_;
+        file_ << "    var" << tree_.getNode(history.at(i - 1)).idx_ << " -> "
               << "var" << node.idx_ << "[color = "
               << ((event == COPY_CNST || event == RVAL_COPY_CNSTR) ? "\"red\"" : "\"black\"")
               << "];\n";

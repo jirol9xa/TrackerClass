@@ -18,7 +18,7 @@ Tracker::Tracker(const Tracker &that) {
     same_time_alive_++;
 
     kTree.addNode({&that, COPY_CNST});
-    kTree.addNode({this, COPY_CNST, true});
+    kTree.addNode({this, COPY_CNST, true}, true);
 }
 
 Tracker::Tracker(Tracker &&that) {
@@ -29,7 +29,7 @@ Tracker::Tracker(Tracker &&that) {
     idx_ = ++obj_amnt_;
     same_time_alive_++;
 
-    kTree.addNode({&that, RVAL_COPY_CNSTR, true});
+    kTree.addNode({&that, RVAL_COPY_CNSTR, true}, true);
     kTree.addNode({this, RVAL_COPY_CNSTR});
 }
 
@@ -41,14 +41,14 @@ const Tracker &Tracker::operator=(Tracker &&that) {
     idx_ = ++obj_amnt_;
     same_time_alive_++;
 
-    kTree.addNode({&that, RVAL_OP_ASGN, true});
+    kTree.addNode({&that, RVAL_OP_ASGN, true}, true);
     kTree.addNode({this, RVAL_OP_ASGN});
 
     return *this;
 }
 
 const Tracker &Tracker::operator+=(const Tracker &that) {
-    kTree.addNode({this, OP_ADD_ASGN, true});
+    kTree.addNode({this, OP_ADD_ASGN, true}, true);
     kTree.addNode({&that, OP_ADD_ASGN});
 
     val_ += that.val_;
@@ -57,7 +57,7 @@ const Tracker &Tracker::operator+=(const Tracker &that) {
     return *this;
 }
 const Tracker &Tracker::operator-=(const Tracker &that) {
-    kTree.addNode({this, OP_SUB_ASGN, true});
+    kTree.addNode({this, OP_SUB_ASGN, true}, true);
     kTree.addNode({&that, OP_SUB_ASGN});
 
     val_ -= that.val_;
@@ -66,7 +66,7 @@ const Tracker &Tracker::operator-=(const Tracker &that) {
     return *this;
 }
 const Tracker &Tracker::operator*=(const Tracker &that) {
-    kTree.addNode({this, OP_MUL_ASGN, true});
+    kTree.addNode({this, OP_MUL_ASGN, true}, true);
     kTree.addNode({&that, OP_MUL_ASGN});
 
     val_ *= that.val_;
@@ -75,7 +75,7 @@ const Tracker &Tracker::operator*=(const Tracker &that) {
     return *this;
 }
 const Tracker &Tracker::operator/=(const Tracker &that) {
-    kTree.addNode({this, OP_DIV_ASGN, true});
+    kTree.addNode({this, OP_DIV_ASGN, true}, true);
     kTree.addNode({&that, OP_DIV_ASGN});
 
     val_ /= that.val_;
@@ -87,7 +87,7 @@ const Tracker &Tracker::operator/=(const Tracker &that) {
 // We will call simply constructors, but it may leed to confusions, mb should do
 // hidden constructors
 Tracker Tracker::operator+(const Tracker &that) {
-    kTree.addNode({this, OP_ADD, true});
+    kTree.addNode({this, OP_ADD, true}, true);
     kTree.addNode({&that, OP_ADD});
 
     ops_rmnd_--;
@@ -97,7 +97,7 @@ Tracker Tracker::operator+(const Tracker &that) {
 }
 
 Tracker Tracker::operator-(const Tracker &that) {
-    kTree.addNode({this, OP_SUB, true});
+    kTree.addNode({this, OP_SUB, true}, true);
     kTree.addNode({&that, OP_SUB});
 
     ops_rmnd_--;
@@ -107,7 +107,7 @@ Tracker Tracker::operator-(const Tracker &that) {
 }
 
 Tracker Tracker::operator*(const Tracker &that) {
-    kTree.addNode({this, OP_MUL, true});
+    kTree.addNode({this, OP_MUL, true}, true);
     kTree.addNode({&that, OP_MUL});
 
     ops_rmnd_--;
@@ -117,7 +117,7 @@ Tracker Tracker::operator*(const Tracker &that) {
 }
 
 Tracker Tracker::operator/(const Tracker &that) {
-    kTree.addNode({this, OP_DIV, true});
+    kTree.addNode({this, OP_DIV, true}, true);
     kTree.addNode({&that, OP_DIV});
 
     ops_rmnd_--;
@@ -127,7 +127,7 @@ Tracker Tracker::operator/(const Tracker &that) {
 }
 
 Tracker::operator int() {
-    kTree.addNode({this, INTPR_AS_INT, true});
+    kTree.addNode({this, INTPR_AS_INT, true}, true);
 
     return val_;
 }

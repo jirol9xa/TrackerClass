@@ -1,10 +1,10 @@
 #pragma once
 
+#include "Tracker.hpp"
+#include <algorithm>
 #include <cstdint>
 #include <unordered_map>
 #include <vector>
-
-#include "Tracker.hpp"
 
 /// Enumeration for events, which my occur
 enum EVENT_TYPE {
@@ -34,9 +34,11 @@ struct Node_t {
 
     Node_t(const Node_t &that);
 
+    const Node_t &operator=(const Node_t &that);
+
     const Tracker *tracked_var_;
     Tracker copy_var_;
-    const EVENT_TYPE event_;
+    EVENT_TYPE event_;
     uint_fast32_t idx_;
 
   private:
@@ -48,7 +50,8 @@ struct Node_t {
 /// tear it apart
 class StoryTree {
   private:
-    mutable std::unordered_map<uint_fast32_t, std::vector<Node_t>> forest_;
+    mutable std::unordered_map<uint_fast32_t, std::vector<uint_fast32_t>> forest_;
+    mutable std::vector<Node_t> nodes_;
 
     StoryTree(){};
 
@@ -61,10 +64,14 @@ class StoryTree {
     StoryTree(const StoryTree &) = delete;
     void operator=(const StoryTree &) = delete;
 
-    void addNode(const Node_t &node);
+    void addNode(const Node_t &node, bool is_unique = false);
 
-    auto getVarHistory(uint_fast32_t idx) const { return forest_[idx]; }
+    std::vector<uint_fast32_t> getVarHistory(uint_fast32_t idx) const { return forest_[idx]; }
+    const Node_t &getNode(uint_fast32_t idx) const { return nodes_[idx]; }
+
     uint_fast32_t getVarAmnt() const { return forest_.size(); }
+
+    void sortNodes() const;
 };
 
 // Name of global var, that should be use as a story tree
