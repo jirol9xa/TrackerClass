@@ -10,8 +10,6 @@ struct Node_t;
 // Implementation for Tracker class
 // TODO: Make it template
 class Tracker {
-    friend struct Node_t;
-
   private:
     int_fast32_t ops_rmnd_ = 5;
     LocationInfo loc_; // For containing birth info
@@ -25,6 +23,8 @@ class Tracker {
   public:
     Tracker() {}
     Tracker(const LocationInfo &birth_info, const int &val = std::rand() % INT32_MAX);
+    Tracker(const LocationInfo &birth_info, const Tracker &that);
+    Tracker(const LocationInfo &birth_info, Tracker &&that);
 
     Tracker(const Tracker &that);
     Tracker(Tracker &&that);

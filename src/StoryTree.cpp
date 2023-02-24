@@ -6,6 +6,14 @@ Node_t::~Node_t() {
         delete tracking_vars_.at(i);
 }
 
+const Tracker *Node_t::findVarInNodeList(uint_fast32_t var_idx) const {
+    for (auto &var : tracking_vars_)
+        if (var->getIdx() == var_idx)
+            return var;
+
+    return nullptr;
+}
+
 void StoryTree::addNode(Node_t *node) { nodes_.push_back(node); }
 
 void StoryTree::linkNode(Node_t *node, const Tracker &var) {

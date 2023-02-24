@@ -1,6 +1,6 @@
 #pragma once
 
-#include "StoryTree.hpp"
+#include <cstdint>
 
 // Class, that implement interface for rendering storyTree
 class TreeViewer {

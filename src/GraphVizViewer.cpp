@@ -1,9 +1,34 @@
 #include "GraphVizViewer.hpp"
 
+#include <iostream>
+
+void GraphVizViewer::drawVarsInNode(const Node_t &node, uint_fast32_t caller_idx) const {
+    unsigned var_amnt = node.getTrackingVarsAmnt();
+    if (var_amnt < 2)
+        return;
+
+    for (unsigned i = 0; i < var_amnt; i++) {
+        uint_fast32_t var_idx = node.getVarIdxOnPos(i);
+        if (i != caller_idx && !isPrinted(var_idx)) {
+            markPrinted(var_idx);
+            drawVarHistory_intrnl(var_idx);
+        }
+    }
+}
+
+void GraphVizViewer::markPrinted(uint_fast32_t var_idx) const {
+    try {
+        alrdy_printed_idxs_.insert(var_idx);
+    } catch (...) {
+        std::cout << "Exception cought\n";
+    }
+}
+
 void GraphVizViewer::drawTree() const {
     makePrologue();
 
-    for (uint_fast32_t i = 0; i < tree_.getVarAmnt(); ++i)
+    unsigned var_amnt = tree_.getVarAmnt();
+    for (uint_fast32_t i = 0; i < var_amnt; ++i)
         drawVarHistory_intrnl(i);
 
     makeEpilogue();
@@ -24,12 +49,19 @@ void GraphVizViewer::drawVarHistory(uint_fast32_t var_idx) const {
     return;
 }
 
+bool GraphVizViewer::isPrinted(uint_fast32_t var_idx) const {
+    return alrdy_printed_idxs_.find(var_idx) != alrdy_printed_idxs_.end();
+}
+
 void GraphVizViewer::makePrologue() const { file_ << "digraph G {\n"; }
 
 void GraphVizViewer::makeEpilogue() const { file_ << "}\n"; }
 
 void GraphVizViewer::showPic() const {
     file_.close();
+
+    // We need clear set for correct printing next time
+    alrdy_printed_idxs_.clear();
 
     // TODO: Try to find out better implementation of this moment
     std::string system_call = "dot -T png " + std::string(file_name_) + " -o pic.png";
@@ -40,13 +72,20 @@ void GraphVizViewer::showPic() const {
 }
 
 void GraphVizViewer::drawVarHistory_intrnl(uint_fast32_t var_idx) const {
+    markPrinted(var_idx);
     const auto &history = tree_.getVarHistory(var_idx);
 
     for (uint_fast32_t i = 0; i < history.size(); ++i) {
         const auto &node = tree_.getNode(history.at(i));
 
+        // If node contains more than one var, it means that the node represent binary operation
+        // or function call, so we need to expect the history of outer vars for completeness
+        drawVarsInNode(node, var_idx);
+
+        const auto *var = node.findVarInNodeList(var_idx);
+
         file_ << "    var" << node.idx_ << "[shape = record, label = \""
-              << "event: " << printEventName(node.event_) << '|' << node.copy_var_.dump();
+              << "event: " << printEventName(node.event_) << '|' << var->dump();
         file_ << "\"];\n";
 
         if (i == 0)

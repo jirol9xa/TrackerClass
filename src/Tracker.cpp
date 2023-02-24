@@ -5,7 +5,7 @@
 #define ADD_BIN_OP_NODE(event_type) kTree.addLink2Nodes(event_type, *this, that);
 
 Tracker::Tracker(const LocationInfo &birth_info, const int &val) : loc_(birth_info), val_(val) {
-    idx_ = ++obj_amnt_;
+    idx_ = obj_amnt_++;
     ++same_time_alive_;
 
     Node_t *ctor = new Node_t{CTOR};
@@ -24,6 +24,18 @@ Tracker::Tracker(const Tracker &that) {
     ADD_BIN_OP_NODE(CTOR);
 }
 
+Tracker::Tracker(const LocationInfo &birth_info, const Tracker &that) {
+    ops_rmnd_ = that.ops_rmnd_;
+    val_ = that.val_;
+
+    idx_ = ++obj_amnt_;
+    same_time_alive_++;
+
+    loc_ = birth_info;
+
+    ADD_BIN_OP_NODE(RVAL_COPY_CNSTR);
+}
+
 Tracker::Tracker(Tracker &&that) {
     ops_rmnd_ = that.ops_rmnd_;
     loc_ = that.loc_;
@@ -31,6 +43,18 @@ Tracker::Tracker(Tracker &&that) {
 
     idx_ = ++obj_amnt_;
     same_time_alive_++;
+
+    ADD_BIN_OP_NODE(RVAL_COPY_CNSTR);
+}
+
+Tracker::Tracker(const LocationInfo &birth_info, Tracker &&that) {
+    ops_rmnd_ = that.ops_rmnd_;
+    val_ = that.val_;
+
+    idx_ = ++obj_amnt_;
+    same_time_alive_++;
+
+    loc_ = birth_info;
 
     ADD_BIN_OP_NODE(RVAL_COPY_CNSTR);
 }

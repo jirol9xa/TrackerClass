@@ -20,9 +20,9 @@ std::string printEventName(enum EVENT_TYPE event);
 /// Implementation for simple node in StoryTree
 struct Node_t : private boost::noncopyable {
     // we need explicit say, that node have no a twin with passing true
-    Node_t(const EVENT_TYPE event, bool is_unique = false) : event_(event) {
-        obj_amnt_ += is_unique;
+    Node_t(const EVENT_TYPE event, bool is_unique = true) : event_(event) {
         idx_ = obj_amnt_;
+        obj_amnt_ += is_unique;
 
         // We need to copy elementwise, because we don't want to trigger copy
         // constructor
@@ -40,6 +40,11 @@ struct Node_t : private boost::noncopyable {
     EVENT_TYPE event_;
     uint_fast32_t idx_;
 
+    const Tracker *findVarInNodeList(uint_fast32_t var_idx) const;
+    EVENT_TYPE getEvent() const { return event_; }
+    uint_fast32_t getIdx() const { return idx_; }
+    uint_fast32_t getTrackingVarsAmnt() const { return tracking_vars_.size(); }
+    uint_fast32_t getVarIdxOnPos(unsigned pos) const { return tracking_vars_[pos]->getIdx(); }
     // That vector used, while showing history of obj, because if the value of var was bornn from
     // values of two vars, we need to show that values too
     std::vector<Tracker *> tracking_vars_;
