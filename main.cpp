@@ -20,6 +20,8 @@ int main() {
 
     CREATE_AND_INIT(C, USE(A) + USE(B));
 
+    USE(C) += USE(A);
+
     render_viz.drawTree();
 
     return 0;

@@ -10,18 +10,14 @@ void GraphVizViewer::drawVarsInNode(const Node_t &node, uint_fast32_t caller_idx
     for (unsigned i = 0; i < var_amnt; i++) {
         uint_fast32_t var_idx = node.getVarIdxOnPos(i);
         if (i != caller_idx && !isPrinted(var_idx)) {
-            markPrinted(var_idx);
+            // markPrinted(var_idx);
             drawVarHistory_intrnl(var_idx);
         }
     }
 }
 
 void GraphVizViewer::markPrinted(uint_fast32_t var_idx) const {
-    try {
-        alrdy_printed_idxs_.insert(var_idx);
-    } catch (...) {
-        std::cout << "Exception cought\n";
-    }
+    alrdy_printed_idxs_.insert(var_idx);
 }
 
 void GraphVizViewer::drawTree() const {
@@ -71,7 +67,22 @@ void GraphVizViewer::showPic() const {
     file_.open(file_name_);
 }
 
+namespace {
+bool isCtor(const Node_t &node, uint_fast32_t var_idx) {
+    const EVENT_TYPE event = node.event_;
+    // if event is one type of ctor, we need make sure, that we have created
+    // element, so we check first position, because we always write *this on first
+    // and that on second position.
+    return (event == CTOR || event == RVAL_COPY_CNSTR || event == RVAL_OP_ASGN ||
+            event == COPY_CNST) &&
+           (node.getVarIdxOnPos(0) == var_idx);
+}
+} // namespace
+
 void GraphVizViewer::drawVarHistory_intrnl(uint_fast32_t var_idx) const {
+    if (isPrinted(var_idx))
+        return;
+
     markPrinted(var_idx);
     const auto &history = tree_.getVarHistory(var_idx);
 
@@ -85,7 +96,9 @@ void GraphVizViewer::drawVarHistory_intrnl(uint_fast32_t var_idx) const {
         const auto *var = node.findVarInNodeList(var_idx);
 
         file_ << "    var" << node.idx_ << "[shape = record, label = \""
-              << "event: " << printEventName(node.event_) << '|' << var->dump();
+              << "event: " << printEventName(node.event_);
+        if (node.getTrackingVarsAmnt() == 1 || isCtor(node, var->getIdx()))
+            file_ << '|' << var->dump();
         file_ << "\"];\n";
 
         if (i == 0)
