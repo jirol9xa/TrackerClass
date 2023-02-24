@@ -15,7 +15,7 @@ void GraphVizViewer::drawTree() const {
 void GraphVizViewer::drawVarHistory(uint_fast32_t var_idx) const {
     makePrologue();
 
-    tree_.sortNodes();
+    // tree_.sortNodes();
     drawVarHistory_intrnl(var_idx);
 
     makeEpilogue();

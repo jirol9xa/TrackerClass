@@ -36,19 +36,24 @@ class Tracker {
         loc_ = loc;
         return *this;
     }
-    const Tracker &operator+=(const Tracker &that);
-    const Tracker &operator-=(const Tracker &that);
-    const Tracker &operator*=(const Tracker &that);
-    const Tracker &operator/=(const Tracker &that);
-    const Tracker &operator=(const Tracker &that);
+    const Tracker &operator+=(Tracker &that);
+    const Tracker &operator-=(Tracker &that);
+    const Tracker &operator*=(Tracker &that);
+    const Tracker &operator/=(Tracker &that);
+    const Tracker &operator=(Tracker &that);
     operator int(); // Operator for implicit casting Tracker val to int
 
-    Tracker operator+(const Tracker &that);
-    Tracker operator-(const Tracker &that);
-    Tracker operator*(const Tracker &that);
-    Tracker operator/(const Tracker &that);
+    Tracker operator+(Tracker &that);
+    Tracker operator-(Tracker &that);
+    Tracker operator*(Tracker &that);
+    Tracker operator/(Tracker &that);
 
     std::string dump() const;
     uint_fast32_t getIdx() const { return idx_; }
+
+    /// This type of copying uses in manipulations, when we don't wont to trigger
+    /// copying constructors
+    static void elementWiseCopy(Tracker *dst, const Tracker *src);
+
     ~Tracker() { --same_time_alive_; }
 };

@@ -1,41 +1,41 @@
 #include "StoryTree.hpp"
+#include <iostream>
 
-Node_t::Node_t(const Node_t &that)
-    : tracked_var_(that.tracked_var_), event_(that.event_), idx_(that.idx_) {
-    // We need to copy elementwise, because we don't want to trigger copy
-    // constructor
-    copy_var_.val_ = that.copy_var_.val_;
-    copy_var_.loc_ = that.copy_var_.loc_;
-    copy_var_.ops_rmnd_ = that.copy_var_.ops_rmnd_;
-    copy_var_.idx_ = that.copy_var_.idx_;
+Node_t::~Node_t() {
+    for (unsigned i = 0; i < tracking_vars_.size(); ++i)
+        delete tracking_vars_.at(i);
 }
 
-const Node_t &Node_t::operator=(const Node_t &that) {
-    tracked_var_ = that.tracked_var_;
-    event_ = that.event_;
-    idx_ = that.idx_;
+void StoryTree::addNode(Node_t *node) { nodes_.push_back(node); }
 
-    // We need to copy elementwise, because we don't want to trigger copy
-    // constructor
-    copy_var_.val_ = that.copy_var_.val_;
-    copy_var_.loc_ = that.copy_var_.loc_;
-    copy_var_.ops_rmnd_ = that.copy_var_.ops_rmnd_;
-    copy_var_.idx_ = that.copy_var_.idx_;
+void StoryTree::linkNode(Node_t *node, const Tracker &var) {
+    auto &bucket = forest_[var.getIdx()];
 
-    return *this;
+    // Here we add node to the history list of variable
+    bucket.push_back(node->idx_);
+
+    // Here we add each variable to the tracking variables list of node
+    Tracker *copy_var = new Tracker();
+    Tracker::elementWiseCopy(copy_var, &var);
+    node->tracking_vars_.push_back(copy_var);
 }
 
-void StoryTree::addNode(const Node_t &node, bool is_unique) {
-    auto &bucket = forest_[node.copy_var_.getIdx()];
-    bucket.push_back(node.idx_);
+void StoryTree::addLink2Nodes(const EVENT_TYPE event, const Tracker &first, const Tracker &second) {
+    Node_t *node = new Node_t{event};
+    addNode(node);
 
-    // if (is_unique)
-    nodes_.push_back(node);
+    linkNode(node, first);
+    linkNode(node, second);
 }
 
-void StoryTree::sortNodes() const {
+/*void StoryTree::sortNodes() const {
     std::sort(nodes_.begin(), nodes_.end(),
               [](const Node_t &first, const Node_t &second) { return first.idx_ > second.idx_; });
+}*/
+
+StoryTree::~StoryTree() {
+    for (unsigned i = 0; i < nodes_.size(); ++i)
+        delete nodes_.at(i);
 }
 
 std::string printEventName(enum EVENT_TYPE event) {

@@ -2,11 +2,15 @@
 #include "Macro.hpp"
 #include "StoryTree.hpp"
 
+#define ADD_BIN_OP_NODE(event_type) kTree.addLink2Nodes(event_type, *this, that);
+
 Tracker::Tracker(const LocationInfo &birth_info, const int &val) : loc_(birth_info), val_(val) {
     idx_ = ++obj_amnt_;
     ++same_time_alive_;
 
-    kTree.addNode({this, CTOR, true});
+    Node_t *ctor = new Node_t{CTOR};
+    kTree.addNode(ctor);
+    kTree.linkNode(ctor, *this);
 }
 
 Tracker::Tracker(const Tracker &that) {
@@ -17,8 +21,7 @@ Tracker::Tracker(const Tracker &that) {
     idx_ = ++obj_amnt_;
     same_time_alive_++;
 
-    kTree.addNode({&that, COPY_CNST});
-    kTree.addNode({this, COPY_CNST, true}, true);
+    ADD_BIN_OP_NODE(CTOR);
 }
 
 Tracker::Tracker(Tracker &&that) {
@@ -29,8 +32,7 @@ Tracker::Tracker(Tracker &&that) {
     idx_ = ++obj_amnt_;
     same_time_alive_++;
 
-    kTree.addNode({&that, RVAL_COPY_CNSTR, true}, true);
-    kTree.addNode({this, RVAL_COPY_CNSTR});
+    ADD_BIN_OP_NODE(RVAL_COPY_CNSTR);
 }
 
 const Tracker &Tracker::operator=(Tracker &&that) {
@@ -41,95 +43,103 @@ const Tracker &Tracker::operator=(Tracker &&that) {
     idx_ = ++obj_amnt_;
     same_time_alive_++;
 
-    kTree.addNode({&that, RVAL_OP_ASGN, true}, true);
-    kTree.addNode({this, RVAL_OP_ASGN});
+    ADD_BIN_OP_NODE(RVAL_OP_ASGN);
 
     return *this;
 }
 
-const Tracker &Tracker::operator+=(const Tracker &that) {
-    kTree.addNode({this, OP_ADD_ASGN, true}, true);
-    kTree.addNode({&that, OP_ADD_ASGN});
-
+const Tracker &Tracker::operator+=(Tracker &that) {
     val_ += that.val_;
     ops_rmnd_--;
+    that.ops_rmnd_--;
+
+    ADD_BIN_OP_NODE(OP_ADD_ASGN);
 
     return *this;
 }
-const Tracker &Tracker::operator-=(const Tracker &that) {
-    kTree.addNode({this, OP_SUB_ASGN, true}, true);
-    kTree.addNode({&that, OP_SUB_ASGN});
-
+const Tracker &Tracker::operator-=(Tracker &that) {
     val_ -= that.val_;
     ops_rmnd_--;
+    that.ops_rmnd_--;
+
+    ADD_BIN_OP_NODE(OP_SUB_ASGN);
 
     return *this;
 }
-const Tracker &Tracker::operator*=(const Tracker &that) {
-    kTree.addNode({this, OP_MUL_ASGN, true}, true);
-    kTree.addNode({&that, OP_MUL_ASGN});
-
+const Tracker &Tracker::operator*=(Tracker &that) {
     val_ *= that.val_;
     ops_rmnd_--;
+    that.ops_rmnd_--;
+
+    ADD_BIN_OP_NODE(OP_MUL_ASGN);
 
     return *this;
 }
-const Tracker &Tracker::operator/=(const Tracker &that) {
-    kTree.addNode({this, OP_DIV_ASGN, true}, true);
-    kTree.addNode({&that, OP_DIV_ASGN});
-
+const Tracker &Tracker::operator/=(Tracker &that) {
     val_ /= that.val_;
     ops_rmnd_--;
+    that.ops_rmnd_--;
+
+    ADD_BIN_OP_NODE(OP_DIV_ASGN);
 
     return *this;
 }
 
 // We will call simply constructors, but it may leed to confusions, mb should do
 // hidden constructors
-Tracker Tracker::operator+(const Tracker &that) {
-    kTree.addNode({this, OP_ADD, true}, true);
-    kTree.addNode({&that, OP_ADD});
-
+Tracker Tracker::operator+(Tracker &that) {
     ops_rmnd_--;
+    that.ops_rmnd_--;
+
+    ADD_BIN_OP_NODE(OP_ADD);
 
     CREATE_AND_INIT(result, val_ + that.val_);
     return result;
 }
 
-Tracker Tracker::operator-(const Tracker &that) {
-    kTree.addNode({this, OP_SUB, true}, true);
-    kTree.addNode({&that, OP_SUB});
-
+Tracker Tracker::operator-(Tracker &that) {
     ops_rmnd_--;
+    that.ops_rmnd_--;
+
+    ADD_BIN_OP_NODE(OP_SUB);
 
     CREATE_AND_INIT(result, val_ - that.val_);
     return result;
 }
 
-Tracker Tracker::operator*(const Tracker &that) {
-    kTree.addNode({this, OP_MUL, true}, true);
-    kTree.addNode({&that, OP_MUL});
-
+Tracker Tracker::operator*(Tracker &that) {
     ops_rmnd_--;
+    that.ops_rmnd_--;
+
+    ADD_BIN_OP_NODE(OP_MUL);
 
     CREATE_AND_INIT(result, val_ * that.val_);
     return result;
 }
 
-Tracker Tracker::operator/(const Tracker &that) {
-    kTree.addNode({this, OP_DIV, true}, true);
-    kTree.addNode({&that, OP_DIV});
-
+Tracker Tracker::operator/(Tracker &that) {
     ops_rmnd_--;
+    that.ops_rmnd_--;
+
+    ADD_BIN_OP_NODE(OP_DIV);
 
     CREATE_AND_INIT(result, val_ / that.val_);
     return result;
 }
 
 Tracker::operator int() {
-    kTree.addNode({this, INTPR_AS_INT, true}, true);
+    Node_t *node = new Node_t{INTPR_AS_INT};
+    kTree.addNode(node);
+    kTree.linkNode(node, *this);
 
     return val_;
+}
+
+void Tracker::elementWiseCopy(Tracker *dst, const Tracker *src) {
+    dst->ops_rmnd_ = src->ops_rmnd_;
+    dst->loc_ = src->loc_;
+    dst->idx_ = src->idx_;
+    dst->val_ = src->val_;
 }
 
 std::string Tracker::dump() const {
